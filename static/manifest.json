@@ -1,0 +1,6 @@
+{
+  "short_name": "bib",
+  "name": "Bible Reader",
+  "start_url": "/",
+  "display": "standalone"
+}
