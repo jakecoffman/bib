@@ -5,8 +5,11 @@
       <button @click="dismiss()" class="align-end">X</button>
     </aside>
     <nav class="flex">
-      <h2 v-if="book" class="flex-1 pointer" @click="picker()">{{book.name}} {{chapter}} 📖</h2>
+      <h2 v-if="book" class="flex-1 pointer" @click="picker()">
+        {{book.name}} {{chapter}}
+      </h2>
       <p class="align-end">
+        <a class="pager" @click="picker()">📖</a>
         <router-link :to="{name: 'History'}" class="pager">📜</router-link>
         <a class="pager" v-show="chapter > 1" @click="back()">⬅️</a>
         <a class="pager" @click="next()">➡️</a>

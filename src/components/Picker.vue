@@ -24,7 +24,7 @@
         </div>
         <spinner v-if="fetchingChapters"></spinner>
         <ul class="flex wrap">
-          <li v-for="c in chapters" class="choosable">
+          <li v-for="c in chapters" class="chapter-choose">
             <a @click="goto(c)">{{c}}</a>
           </li>
         </ul>
@@ -91,7 +91,7 @@
   }
 
   .choosable {
-    padding: 10px;
+    padding-top: 10px;
   }
 
   ul {
@@ -100,10 +100,6 @@
 
   a {
     cursor: pointer;
-  }
-
-  .between {
-    justify-content: space-between;
   }
 
   #ot {
@@ -120,5 +116,9 @@
 
   .picker {
     font-size: 36pt;
+  }
+
+  .chapter-choose {
+    padding: 10px;
   }
 </style>
