@@ -7,6 +7,7 @@
     <nav class="flex">
       <h2 v-if="book" class="flex-1 pointer" @click="picker()">{{book.name}} {{chapter}} 📖</h2>
       <p class="align-end">
+        <router-link :to="{name: 'History'}" class="page">📜</router-link>
         <a class="page" v-show="chapter > 1" @click="back()">⬅️</a>
         <a class="page" @click="next()">➡️</a>
       </p>

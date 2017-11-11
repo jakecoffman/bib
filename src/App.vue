@@ -55,4 +55,10 @@
   .wj {
     color: red;
   }
+
+  a { text-decoration: none; }
+  a:visited { text-decoration: none; color: #dbdbdb; }
+  a:hover { text-decoration: none; color: #dbdbdb; }
+  a:focus { text-decoration: none; color: #dbdbdb; }
+  a:hover, a:active { text-decoration: none; color: red }
 </style>

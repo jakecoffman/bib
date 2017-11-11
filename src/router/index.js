@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Bible from '@/components/Bible'
 import Picker from '@/components/Picker'
+import History from '@/components/History'
 
 Vue.use(Router)
 
@@ -27,6 +28,11 @@ export default new Router({
       path: '/picker',
       name: 'Picker',
       component: Picker
+    },
+    {
+      path: '/history',
+      name: 'History',
+      component: History
     }
   ]
 })
