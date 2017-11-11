@@ -58,7 +58,19 @@
 
   a { text-decoration: none; }
   a:visited { text-decoration: none; color: #dbdbdb; }
-  a:hover { text-decoration: none; color: #dbdbdb; }
   a:focus { text-decoration: none; color: #dbdbdb; }
   a:hover, a:active { text-decoration: none; color: red }
+
+  ul {
+    list-style: none;
+  }
+
+  .back {
+    color: transparent;
+    text-shadow: 0 0 0 #dbdbdb;
+  }
+  .pager {
+    margin-left: 20px;
+    font-size: 42pt;
+  }
 </style>

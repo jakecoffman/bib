@@ -7,9 +7,9 @@
     <nav class="flex">
       <h2 v-if="book" class="flex-1 pointer" @click="picker()">{{book.name}} {{chapter}} 📖</h2>
       <p class="align-end">
-        <router-link :to="{name: 'History'}" class="page">📜</router-link>
-        <a class="page" v-show="chapter > 1" @click="back()">⬅️</a>
-        <a class="page" @click="next()">➡️</a>
+        <router-link :to="{name: 'History'}" class="pager">📜</router-link>
+        <a class="pager" v-show="chapter > 1" @click="back()">⬅️</a>
+        <a class="pager" @click="next()">➡️</a>
       </p>
     </nav>
     <spinner v-if="isLoadingVerses"></spinner>
@@ -17,8 +17,8 @@
       <span v-html="verse.Text"></span>
     </span>
     <p class="right">
-      <a class="page" v-show="chapter > 1" @click="back()">⬅️</a>
-      <a class="page" @click="next()">➡️</a>
+      <a class="pager" v-show="chapter > 1" @click="back()">⬅️</a>
+      <a class="pager" @click="next()">➡️</a>
     </p>
   </div>
 </template>
@@ -105,10 +105,6 @@
   }
   .bible nav {
     display: flex;
-  }
-  .page {
-    margin-left: 20px;
-    font-size: 42pt;
   }
   .bible aside {
     background: red;

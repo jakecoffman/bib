@@ -18,7 +18,10 @@
         </ul>
       </div>
       <div id="chaps" v-if="!pickingBook">
-        <h2><a @click="pickBookAgain()"><</a> {{book.name}}</h2>
+        <div class="flex align-center">
+          <h2 class="flex-1">{{book.name}}</h2>
+          <a class="align-end pager back" @click="pickBookAgain()">🔙</a>
+        </div>
         <spinner v-if="fetchingChapters"></spinner>
         <ul class="flex wrap">
           <li v-for="c in chapters" class="choosable">
