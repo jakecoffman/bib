@@ -4,6 +4,8 @@ import Bible from '@/components/Bible'
 import Picker from '@/components/Picker'
 import History from '@/components/History'
 
+import store from '@/store'
+
 Vue.use(Router)
 
 export default new Router({
@@ -13,7 +15,12 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: {name: 'Bible', params: {book: 'Gen', chapter: '1'}}
+      redirect: to => {
+        if (store.state.book) {
+          return {name: 'Bible', params: {book: store.state.book, chapter: store.state.chapter || 1}}
+        }
+        return {name: 'Bible', params: {book: 'Gen', chapter: '1'}}
+      }
     },
     {
       path: '/bible/:book',
