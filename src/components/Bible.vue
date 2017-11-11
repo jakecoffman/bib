@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="bible">
     <aside v-if="error" class="flex">
       <span class="flex-1">Error: {{error}}</span>
       <button @click="dismiss()" class="align-end">X</button>
@@ -7,16 +7,16 @@
     <nav class="flex">
       <h2 v-if="book" class="flex-1 pointer" @click="picker()">{{book.name}} {{chapter}} 📖</h2>
       <p class="align-end">
-        <a class="page" :class="{disabled: chapter === 1}" @click="back()">⬅️</a>
+        <a class="page" v-show="chapter > 1" @click="back()">⬅️</a>
         <a class="page" @click="next()">➡️</a>
       </p>
     </nav>
     <spinner v-if="isLoadingVerses"></spinner>
-    <span v-else v-for="verse in verses">
+    <span v-if="!isLoadingVerses" v-for="verse in verses">
       <span v-html="verse.Text"></span>
     </span>
     <p class="right">
-      <a class="page" :class="{disabled: chapter === 1}" @click="back()">⬅️</a>
+      <a class="page" v-show="chapter > 1" @click="back()">⬅️</a>
       <a class="page" @click="next()">➡️</a>
     </p>
   </div>
@@ -49,37 +49,30 @@
     watch: {
       async '$route.params.book' (newBook) {
         this.$store.commit('setBook', newBook)
-        this.verses = await bible.fetchVerses(this.book, this.chapter)
+        this.isLoadingVerses = true
+        this.verses = await bible.fetchVerses(this.book.abbr, this.chapter)
         this.isLoadingVerses = false
-        this.chapters = await bible.fetchChapters(this.book.abbr)
-        this.isLoadingChapters = false
       },
       async '$route.params.chapter' (newChapter) {
         this.$store.commit('setChapter', newChapter)
-        this.verses = await bible.fetchVerses(this.book, this.chapter)
+        this.isLoadingVerses = true
+        this.verses = await bible.fetchVerses(this.book.abbr, this.chapter)
         this.isLoadingVerses = false
       }
     },
     async mounted () {
-      if (this.$route.params.book) {
-        this.$store.commit('setBook', this.$route.params.book)
-        if (this.book === undefined) {
-          this.error = 'Book not found'
-          return
-        }
-      } else {
-        this.$router.push({name: 'Chapter', params: {book: 'Gen', chapter: 1}})
-      }
-      if (this.$route.params.chapter) {
-        this.$store.commit('setChapter', this.$route.params.chapter)
-      } else {
-        this.$router.push({name: 'Chapter', params: {book: this.book.abbr, chapter: 1}})
-      }
+      this.isLoadingVerses = true
+      this.isLoadingChapters = true
 
-      this.verses = await bible.fetchVerses(this.book, this.chapter)
+      this.$store.commit('setBook', this.$route.params.book)
+      if (this.book === undefined) {
+        this.error = 'Book not found'
+        return
+      }
+      this.$store.commit('setChapter', this.$route.params.chapter)
+
+      this.verses = await bible.fetchVerses(this.book.abbr, this.chapter)
       this.isLoadingVerses = false
-      this.chapters = await bible.fetchChapters(this.book.abbr)
-      this.isLoadingChapters = false
     },
     methods: {
       dismiss() {
@@ -89,12 +82,10 @@
         if (this.chapter === 1) {
           return
         }
-        this.isLoadingVerses = true
-        this.$router.push({name: 'Chapter', params: {book: this.book.abbr, chapter: this.chapter - 1}})
+        this.$router.push({name: 'Bible', params: {book: this.book.abbr, chapter: this.chapter - 1}})
       },
       next() {
-        this.isLoadingVerses = true
-        this.$router.push({name: 'Chapter', params: {book: this.book.abbr, chapter: this.chapter + 1}})
+        this.$router.push({name: 'Bible', params: {book: this.book.abbr, chapter: this.chapter + 1}})
       },
       picker() {
         this.$router.push({name: 'Picker'})
@@ -108,10 +99,17 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  nav {
+  .bible {
+    font-size: 24pt;
+  }
+  .bible nav {
     display: flex;
   }
-  aside {
+  .page {
+    margin-left: 20px;
+    font-size: 42pt;
+  }
+  .bible aside {
     background: red;
     padding: 10px;
     border-radius: 5px;
@@ -120,11 +118,8 @@
   .pointer {
     cursor: pointer;
   }
-  a {
+  .bible a {
     cursor: pointer;
-  }
-  .page {
-    font-size: 90pt;
   }
   .right {
     float: right;

@@ -12,17 +12,15 @@ export default new Router({
   routes: [
     {
       path: '/',
+      redirect: {name: 'Bible', params: {book: 'Gen', chapter: '1'}}
+    },
+    {
+      path: '/bible/:book',
+      redirect: to => to.path + '/1'
+    },
+    {
+      path: '/bible/:book/:chapter',
       name: 'Bible',
-      component: Bible
-    },
-    {
-      path: '/:book',
-      name: 'Book',
-      component: Bible
-    },
-    {
-      path: '/:book/:chapter',
-      name: 'Chapter',
       component: Bible
     },
     {

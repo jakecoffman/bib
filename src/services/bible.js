@@ -81,12 +81,12 @@ async function fetchChapters(bookAbbr) {
 
 const verseCache = {}
 
-async function fetchVerses(book, chapter) {
-  const key = book + chapter
+async function fetchVerses(bookAbbr, chapter) {
+  const key = bookAbbr + chapter
   if (verseCache[key] !== undefined) {
     return verseCache[key]
   }
-  const verses = (await axios.get('/api/versions/ESV/' + book.abbr + '/' + chapter)).data
+  const verses = (await axios.get('/api/versions/ESV/' + bookAbbr + '/' + chapter)).data
   verseCache[key] = verses
   return verses
 }

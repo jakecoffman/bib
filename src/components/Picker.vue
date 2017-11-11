@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="picker">
     <div class="flex">
       <div id="ot" v-if="pickingBook">
         <h2>Old</h2>
@@ -56,8 +56,7 @@
         chapter: 'chapter'
       })
     },
-    async mounted() {
-      this.chapters = await bible.fetchChapters(this.book.abbr)
+    mounted() {
       this.pickingBook = true
     },
     methods: {
@@ -74,7 +73,7 @@
       },
       goto(chapter) {
         this.$store.commit('setChapter', chapter)
-        this.$router.replace({name: 'Chapter', params: {book: this.book.abbr, chapter: chapter}})
+        this.$router.replace({name: 'Bible', params: {book: this.book.abbr, chapter: chapter}})
       },
       pickBookAgain() {
         this.pickingBook = true
@@ -116,7 +115,7 @@
     width: 100%;
   }
 
-  body {
+  .picker {
     font-size: 36pt;
   }
 </style>
