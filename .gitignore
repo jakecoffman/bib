@@ -16,3 +16,4 @@ test/unit/coverage
 
 bib
 secret.go
+bibleCache.json
