@@ -2,7 +2,7 @@
   <div class="bible">
     <transition name="slide">
       <header v-show="isHeaderVisible">
-        <nav class="flex">
+        <nav class="flex align-center">
           <h2 v-if="book" class="flex-1 pointer" @click="picker()">
             {{book.name}} {{chapter}}
           </h2>
@@ -143,7 +143,8 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  $header: 80px;
+  $header: 130px;
+  $hfont: 5rem;
   .bible {
     font-size: 24pt;
     margin: 0;
@@ -154,6 +155,10 @@
     position: fixed;
     top: 0;
     width: 100%;
+    font-size: $hfont - 3rem;
+  }
+  .bible .pager {
+    font-size: $hfont;
   }
   .bible nav {
     display: flex;
@@ -179,9 +184,6 @@
   }
   .right {
     float: right;
-  }
-  .nav-up {
-    top: -$header;
   }
   .slide-enter-active {
     transition: all 0.3s ease-in-out
