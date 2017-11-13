@@ -17,6 +17,7 @@
     -moz-osx-font-smoothing: grayscale;
     color: #dbdbdb;
     background: #000;
+    margin: 0;
   }
   .flex {
     display: flex;
@@ -44,18 +45,6 @@
     $flex: $flex - 1;
   }
 
-  /*This is bible stuff*/
-  .p {
-    display: inline;
-  }
-  sup {
-    color: #daffbf;
-    margin-left: 10px;
-  }
-  .wj {
-    color: red;
-  }
-
   a { text-decoration: none; }
   a:visited { text-decoration: none; color: #dbdbdb; }
   a:focus { text-decoration: none; color: #dbdbdb; }
@@ -72,5 +61,23 @@
   .pager {
     margin-left: 20px;
     font-size: 42pt;
+  }
+
+  /*This is bible stuff*/
+  .p {
+    display: inline;
+  }
+  sup {
+    color: #daffbf;
+    margin-left: 10px;
+  }
+  .wj {
+    color: red;
+  }
+  .q1 {
+    margin-left: 2rem;
+  }
+  .q2 {
+    margin-left: 4rem;
   }
 </style>

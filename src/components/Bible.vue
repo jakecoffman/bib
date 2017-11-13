@@ -1,28 +1,37 @@
 <template>
   <div class="bible">
+    <transition name="slide">
+      <header v-show="isHeaderVisible">
+        <nav class="flex">
+          <h2 v-if="book" class="flex-1 pointer" @click="picker()">
+            {{book.name}} {{chapter}}
+          </h2>
+          <div class="align-end">
+            <a class="pager" @click="picker()">📖</a>
+            <router-link :to="{name: 'History'}" class="pager">📜</router-link>
+            <a class="pager" v-show="chapter > 1" @click="back()">⬅️</a>
+            <a class="pager" @click="next()">➡️</a>
+          </div>
+        </nav>
+      </header>
+    </transition>
     <aside v-if="error" class="flex">
       <span class="flex-1">Error: {{error}}</span>
       <button @click="dismiss()" class="align-end">X</button>
     </aside>
-    <nav class="flex">
-      <h2 v-if="book" class="flex-1 pointer" @click="picker()">
-        {{book.name}} {{chapter}}
-      </h2>
-      <p class="align-end">
-        <a class="pager" @click="picker()">📖</a>
-        <router-link :to="{name: 'History'}" class="pager">📜</router-link>
+    <main>
+      <spinner v-if="isLoadingVerses"></spinner>
+      <span v-if="!isLoadingVerses" v-for="verse in verses" id="verses">
+        <span v-html="verse.Text"></span>
+      </span>
+      <span id="main"></span>
+    </main>
+    <footer>
+      <p class="right">
         <a class="pager" v-show="chapter > 1" @click="back()">⬅️</a>
         <a class="pager" @click="next()">➡️</a>
       </p>
-    </nav>
-    <spinner v-if="isLoadingVerses"></spinner>
-    <span v-if="!isLoadingVerses" v-for="verse in verses">
-      <span v-html="verse.Text"></span>
-    </span>
-    <p class="right">
-      <a class="pager" v-show="chapter > 1" @click="back()">⬅️</a>
-      <a class="pager" @click="next()">➡️</a>
-    </p>
+    </footer>
   </div>
 </template>
 
@@ -39,7 +48,13 @@
         chapters: [],
         error: '',
         isLoadingVerses: true,
-        isLoadingChapters: true
+        isLoadingChapters: true,
+
+        // scrolly stuff
+        isHeaderVisible: true,
+        scroller: null,
+        didScroll: false,
+        previousScrollPos: 0
       }
     },
     computed: {
@@ -93,21 +108,56 @@
       },
       picker() {
         this.$router.push({name: 'Picker'})
+      },
+      handleScroll() {
+        this.didScroll = true
+      },
+      hasScrolled() {
+        const scrollPos = document.scrollingElement.scrollTop
+        if (scrollPos > this.previousScrollPos) {
+          this.isHeaderVisible = false
+        } else if (scrollPos < this.previousScrollPos) {
+          this.isHeaderVisible = true
+        }
+        this.previousScrollPos = scrollPos
       }
     },
     components: {
       Spinner
+    },
+    created: function () {
+      window.addEventListener('scroll', this.handleScroll)
+      this.scroller = setInterval(() => {
+        if (this.didScroll) {
+          this.hasScrolled()
+          this.didScroll = false
+        }
+      }, 250)
+    },
+    destroyed: function () {
+      window.removeEventListener('scroll', this.handleScroll)
+      clearInterval(this.scroller)
     }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
+  $header: 80px;
   .bible {
     font-size: 24pt;
+    margin: 0;
+  }
+  .bible header {
+    background: #3c3c3c;
+    height: $header;
+    position: fixed;
+    top: 0;
+    width: 100%;
   }
   .bible nav {
     display: flex;
+    padding: 10px;
   }
   .bible aside {
     background: red;
@@ -115,13 +165,31 @@
     border-radius: 5px;
     font-weight: bolder;
   }
+  .bible main {
+    padding: $header 0.5rem 0.5rem;
+  }
   .pointer {
     cursor: pointer;
   }
   .bible a {
     cursor: pointer;
   }
+  .bible h2 {
+    margin: 0;
+  }
   .right {
     float: right;
+  }
+  .nav-up {
+    top: -$header;
+  }
+  .slide-enter-active {
+    transition: all 0.3s ease-in-out
+  }
+  .slide-leave-active {
+    transition: all 0.3s ease-in-out
+  }
+  .slide-enter, .slide-leave-to {
+    transform: translateY(-$header);
   }
 </style>
