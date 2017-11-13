@@ -132,7 +132,7 @@
           this.hasScrolled()
           this.didScroll = false
         }
-      }, 250)
+      }, 100)
     },
     destroyed: function () {
       window.removeEventListener('scroll', this.handleScroll)
@@ -143,7 +143,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  $header: 120px;
+  $header: 115px;
   $hfont: 5rem;
   .bible {
     font-size: 24pt;
@@ -156,6 +156,7 @@
     top: 0;
     width: 100%;
     font-size: $hfont - 3rem;
+    border-bottom: 1px #646464 solid;
   }
   .bible .pager {
     font-size: $hfont;
