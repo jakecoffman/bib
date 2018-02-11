@@ -80,4 +80,7 @@
   .q2 {
     margin-left: 4rem;
   }
+  .notelink {
+    display: none;
+  }
 </style>

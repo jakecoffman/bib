@@ -20,10 +20,8 @@
       <button @click="dismiss()" class="align-end">X</button>
     </aside>
     <main>
-      <spinner v-if="isLoadingVerses"></spinner>
-      <span v-if="!isLoadingVerses" v-for="verse in verses" id="verses">
-        <span v-html="verse.Text"></span>
-      </span>
+      <spinner v-if="isLoadingVerses"/>
+      <span v-html="verses"></span>
       <span id="main"></span>
     </main>
     <footer>
@@ -44,7 +42,7 @@
     name: 'Bible',
     data () {
       return {
-        verses: [],
+        verses: "",
         chapters: [],
         error: '',
         isLoadingVerses: true,

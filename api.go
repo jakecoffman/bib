@@ -175,5 +175,5 @@ func ListVerses(c *gin.Context) {
 
 	cache.Put(key, response.Text)
 
-	c.JSON(200, response.Text)
+	c.String(200, response.Text)
 }
