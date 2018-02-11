@@ -2,23 +2,22 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
-
 	"os"
+	"strconv"
 	"sync"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (
-	key       = Key
-	pw        = Pw
+	//key       = Key
+	//pw        = Pw
 	esv       = "eng-ESV"
 	msg       = "eng-MSG"
 	https     = "https://"
-	biblesUrl = https + key + ":" + pw + "@" + "bibles.org/v2"
+	biblesUrl = https + "bibles.org"
 )
 
 var versions = []string{esv, msg}
@@ -28,22 +27,12 @@ type Book struct {
 	Name string `json:"name"`
 }
 
-type Chapter struct {
-	Chapter string `json:"chapter"`
-}
-
-type Verse struct {
-	Verse string `db:"verse"`
-	Text  string `db:"text"`
-	// TODO: Next and Prev
-}
-
 type Cache struct {
 	sync.RWMutex
-	Data map[string][]Verse
+	Data map[string]string
 }
 
-func (c *Cache) Put(key string, verses []Verse) {
+func (c *Cache) Put(key string, verses string) {
 	c.Lock()
 	defer c.Unlock()
 	c.Data[key] = verses
@@ -58,11 +47,9 @@ func (c *Cache) Put(key string, verses []Verse) {
 	if err = json.NewEncoder(f).Encode(c.Data); err != nil {
 		log.Println(err)
 	}
-
-	log.Println("OK!")
 }
 
-func (c *Cache) Get(key string) []Verse {
+func (c *Cache) Get(key string) string {
 	c.RLock()
 	defer c.RUnlock()
 	return c.Data[key]
@@ -70,10 +57,10 @@ func (c *Cache) Get(key string) []Verse {
 
 var cache = Cache{
 	RWMutex: sync.RWMutex{},
-	Data:    map[string][]Verse{},
+	Data:    map[string]string{},
 }
 
-const cacheFile = "./bibleCache.json"
+const cacheFile = "./bibleCache_2.json"
 
 func init() {
 	f, err := os.Open(cacheFile)
@@ -103,24 +90,26 @@ func main() {
 }
 
 func ListBooks(c *gin.Context) {
-	r, err := http.Get(biblesUrl + "/versions/eng-ESV/books.js")
+	req, err := http.NewRequest("GET", biblesUrl+"/versions/eng-ESV/books.json", nil)
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{"error": "error talking to bibles.org"})
+		return
+	}
+	r, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, gin.H{"error": "error talking to bibles.org"})
 		return
 	}
 	defer r.Body.Close()
-	var response struct {
-		Response struct {
-			Books []Book `json:"books"`
-		} `json:"response"`
-	}
-	if err = json.NewDecoder(r.Body).Decode(&response); err != nil {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 		log.Println(err)
-		c.JSON(500, gin.H{"error": "error decoding data from bibles.org"})
+		c.JSON(500, gin.H{"error": "error talking to bibles.org"})
 		return
 	}
-	c.JSON(200, response.Response.Books)
+	c.String(200, string(data))
 }
 
 func ListVersions(c *gin.Context) {
@@ -130,16 +119,15 @@ func ListVersions(c *gin.Context) {
 func ListChapters(c *gin.Context) {
 	version := c.Param("version")
 	book := c.Param("book")
-	r, err := http.Get(biblesUrl + "/books/eng-" + version + ":" + book + "/chapters.js")
+	r, err := http.Get(biblesUrl + "/books/eng-" + version + ":" + book + "/chapters.json")
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, gin.H{"error": "error talking to bibles.org"})
 		return
 	}
-	var response struct {
-		Response struct {
-			Chapters []Chapter `json:"chapters"`
-		} `json:"response"`
+	defer r.Body.Close()
+	var response []struct {
+		Chapter string `json:"chapter"`
 	}
 	if err = json.NewDecoder(r.Body).Decode(&response); err != nil {
 		log.Println(err)
@@ -147,7 +135,7 @@ func ListChapters(c *gin.Context) {
 		return
 	}
 	var chapters []int
-	for _, ch := range response.Response.Chapters {
+	for _, ch := range response {
 		chap, err := strconv.Atoi(ch.Chapter)
 		if err != nil {
 			log.Println(err)
@@ -156,7 +144,6 @@ func ListChapters(c *gin.Context) {
 		}
 		chapters = append(chapters, chap)
 	}
-	log.Println("Data from bibles.org", r.StatusCode, chapters)
 	c.JSON(200, chapters)
 }
 
@@ -166,21 +153,19 @@ func ListVerses(c *gin.Context) {
 	book := c.Param("book")
 	key := version + "/" + book + "/" + chapter
 
-	if verses := cache.Get(key); verses != nil {
+	if verses := cache.Get(key); verses != "" {
 		c.JSON(200, verses)
 		return
 	}
-
-	r, err := http.Get(biblesUrl + "/chapters/eng-" + version + ":" + book + "." + chapter + "/verses.js")
+	r, err := http.Get(biblesUrl + "/chapters/eng-" + version + ":" + book + "." + chapter + ".json")
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, gin.H{"error": "error talking to bibles.org"})
 		return
 	}
+	defer r.Body.Close()
 	var response struct {
-		Response struct {
-			Verses []Verse `json:"verses"`
-		} `json:"response"`
+		Text string `json:"text"`
 	}
 	if err = json.NewDecoder(r.Body).Decode(&response); err != nil {
 		log.Println(err)
@@ -188,7 +173,7 @@ func ListVerses(c *gin.Context) {
 		return
 	}
 
-	cache.Put(key, response.Response.Verses)
+	cache.Put(key, response.Text)
 
-	c.JSON(200, response.Response.Verses)
+	c.JSON(200, response.Text)
 }
