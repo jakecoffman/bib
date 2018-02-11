@@ -156,6 +156,7 @@ func ListChapters(c *gin.Context) {
 		}
 		chapters = append(chapters, chap)
 	}
+	log.Println("Data from bibles.org", r.StatusCode, chapters)
 	c.JSON(200, chapters)
 }
 
