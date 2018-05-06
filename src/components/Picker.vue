@@ -119,6 +119,7 @@
   }
 
   .chapter-choose {
-    padding: 10px 10px 10px 15px;
+    padding: 15px;
+    font-size: 1.5em;
   }
 </style>
